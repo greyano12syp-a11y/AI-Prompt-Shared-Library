@@ -1,0 +1,13 @@
+# 本地运行数据与临时文件
+.claude/
+prompt-palette-data/
+node_modules/
+*.log
+*.tmp
+*.bak*
+*.lnk
+
+# 系统与编辑器
+.DS_Store
+Thumbs.db
+.vscode/

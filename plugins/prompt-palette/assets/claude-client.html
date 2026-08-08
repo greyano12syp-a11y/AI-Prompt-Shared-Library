@@ -1,0 +1,362 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Claude 客户端</title>
+<style>
+  :root {
+    --bg: #0E0E11; --panel: #141418; --panel2: #1D1D22; --border: #26262D;
+    --text: #E8E6E3; --muted: #9A9792; --accent: #FF7A45; --accent2: #FF9159;
+    --green: #4ADE80; --red: #F87171; --yellow: #FBBF24;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body { height: 100%; }
+  body {
+    background: var(--bg); color: var(--text);
+    font-family: "Microsoft YaHei UI", "Microsoft YaHei", system-ui, sans-serif;
+    font-size: 15px; display: flex; flex-direction: column; overflow: hidden;
+  }
+  header {
+    display: flex; align-items: center; gap: 10px; padding: 10px 16px;
+    background: var(--panel); border-bottom: 1px solid var(--border);
+    flex-wrap: wrap;
+  }
+  header h1 { font-size: 16px; font-weight: 700; margin-right: auto; }
+  header .btn, .btn {
+    background: var(--panel2); color: var(--text); border: 1px solid var(--border);
+    border-radius: 8px; padding: 7px 12px; font-size: 13px; cursor: pointer;
+    font-family: inherit;
+  }
+  header .btn:hover, .btn:hover { border-color: var(--accent); color: #fff; }
+  .btn.primary { background: var(--accent); border-color: var(--accent); color: #0B0B0E; font-weight: 600; }
+  .btn.primary:hover { background: var(--accent2); }
+  .btn.active { border-color: var(--accent); color: var(--accent2); }
+  main { flex: 1; display: flex; min-height: 0; }
+  aside {
+    width: 240px; background: var(--panel); border-right: 1px solid var(--border);
+    display: flex; flex-direction: column; min-height: 0;
+  }
+  aside .aside-title { padding: 12px 14px 6px; font-size: 12px; color: var(--muted); }
+  #sessionList { flex: 1; overflow-y: auto; padding: 4px 8px 8px; }
+  .sess-item {
+    padding: 9px 10px; border-radius: 8px; cursor: pointer; margin-bottom: 4px;
+    border: 1px solid transparent; display: flex; align-items: center; gap: 6px;
+  }
+  .sess-item:hover { background: var(--panel2); }
+  .sess-item.active { background: var(--panel2); border-color: var(--accent); }
+  .sess-item .name { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 13px; }
+  .sess-item .meta { font-size: 11px; color: var(--muted); }
+  .sess-item .stop { color: var(--muted); font-size: 12px; padding: 0 4px; }
+  .sess-item .stop:hover { color: var(--red); }
+  #chat {
+    flex: 1; display: flex; flex-direction: column; min-width: 0;
+  }
+  #chatHead { padding: 10px 16px; border-bottom: 1px solid var(--border); font-size: 13px; color: var(--muted); display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+  #chatHead .dot { width: 8px; height: 8px; border-radius: 50%; background: var(--muted); }
+  #chatHead .dot.on { background: var(--green); }
+  #messages { flex: 1; overflow-y: auto; padding: 16px; display: flex; flex-direction: column; gap: 12px; }
+  .msg { max-width: 78%; padding: 10px 14px; border-radius: 14px; line-height: 1.65; white-space: pre-wrap; word-break: break-word; font-size: 14.5px; }
+  .msg.user { align-self: flex-end; background: color-mix(in srgb, var(--accent) 22%, var(--panel2)); border: 1px solid color-mix(in srgb, var(--accent) 45%, transparent); }
+  .msg.assistant { align-self: flex-start; background: var(--panel2); border: 1px solid var(--border); }
+  .msg.error { align-self: flex-start; background: color-mix(in srgb, var(--red) 15%, var(--panel2)); border-color: var(--red); color: var(--red); }
+  .msg .think { color: var(--muted); font-size: 13px; font-style: italic; margin-bottom: 4px; }
+  #inputBar { border-top: 1px solid var(--border); padding: 10px 16px; display: flex; gap: 10px; align-items: flex-end; }
+  #inputBar textarea {
+    flex: 1; background: var(--panel2); border: 1px solid var(--border); border-radius: 10px;
+    color: var(--text); font-size: 14.5px; padding: 10px 12px; resize: none; min-height: 44px; max-height: 160px;
+    font-family: inherit; outline: none;
+  }
+  #inputBar textarea:focus { border-color: var(--accent); }
+  .modal-overlay {
+    position: fixed; inset: 0; background: rgba(0,0,0,.55); display: none;
+    align-items: center; justify-content: center; z-index: 100; padding: 20px;
+  }
+  .modal-overlay.open { display: flex; }
+  .modal {
+    background: var(--panel); border: 1px solid var(--border); border-radius: 14px;
+    width: 100%; max-width: 560px; padding: 20px; max-height: 80vh; overflow-y: auto;
+  }
+  .modal h3 { font-size: 16px; margin-bottom: 12px; }
+  .modal .row { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; margin-top: 10px; }
+  .modal select, .modal input {
+    background: var(--panel2); border: 1px solid var(--border); color: var(--text);
+    border-radius: 8px; padding: 8px 10px; font-size: 14px; font-family: inherit; flex: 1; min-width: 180px;
+  }
+  .hint { color: var(--muted); font-size: 12.5px; margin-top: 6px; line-height: 1.6; }
+  table { width: 100%; border-collapse: collapse; margin-top: 8px; font-size: 13px; }
+  th, td { text-align: right; padding: 5px 8px; border-bottom: 1px solid var(--border); }
+  th:first-child, td:first-child { text-align: left; }
+  th { color: var(--muted); font-weight: 500; }
+  .stat-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)); gap: 10px; margin-top: 10px; }
+  .stat { background: var(--panel2); border: 1px solid var(--border); border-radius: 10px; padding: 10px 12px; }
+  .stat b { display: block; font-size: 17px; margin-top: 2px; }
+  .stat span { font-size: 12px; color: var(--muted); }
+  .actions { display: flex; justify-content: flex-end; gap: 8px; margin-top: 16px; }
+  .empty { color: var(--muted); text-align: center; margin-top: 60px; font-size: 14px; }
+  ::-webkit-scrollbar { width: 8px; }
+  ::-webkit-scrollbar-thumb { background: #2A2A31; border-radius: 4px; }
+</style>
+</head>
+<body>
+<header>
+  <h1>💬 Claude 客户端</h1>
+  <button class="btn" id="btnNew">＋ 新建对话</button>
+  <button class="btn" id="btnUsage">📊 Token 用量</button>
+  <button class="btn" id="btnPerm">🔐 权限模式</button>
+  <a class="btn" href="/app" style="text-decoration:none">📚 提示词工作台</a>
+</header>
+<main>
+  <aside>
+    <div class="aside-title">对话窗口（按项目区分）</div>
+    <div id="sessionList"></div>
+  </aside>
+  <section id="chat">
+    <div id="chatHead">
+      <span class="dot" id="statusDot"></span>
+      <span id="chatTitle">请选择或新建一个对话</span>
+      <span class="hint" id="chatHint" style="margin:0"></span>
+    </div>
+    <div id="messages"><div class="empty">左侧新建对话窗口，不同项目分开对话，避免混淆。</div></div>
+    <div id="inputBar">
+      <textarea id="input" placeholder="给 Claude 发消息…（Enter 发送，Shift+Enter 换行）" disabled></textarea>
+      <button class="btn primary" id="btnSend" disabled>发送</button>
+    </div>
+  </section>
+</main>
+
+<div class="modal-overlay" id="newModal">
+  <div class="modal">
+    <h3>新建对话窗口</h3>
+    <label class="hint">选择项目目录（对话按项目分开）：</label>
+    <div class="row">
+      <select id="projectSel">
+        <option value="C:\Users\Admin\plugins\prompt-palette">prompt-palette 插件项目</option>
+        <option value="C:\Users\Admin\Documents\Codex\2026-08-05\1-2-3\outputs">AI 提示词工作台 outputs</option>
+        <option value="C:\Users\Admin\Documents\Codex">Codex 文档目录</option>
+        <option value="__custom__">自定义路径…</option>
+      </select>
+    </div>
+    <div class="row" id="customRow" style="display:none">
+      <input type="text" id="customPath" placeholder="输入项目文件夹绝对路径">
+    </div>
+    <div class="hint">新会话会读取该项目的 CLAUDE.md 与 .claude 权限配置；命令类操作如需批准，请先在“权限模式”里选择“帮我批准”或“完全全自动”。</div>
+    <div class="actions">
+      <button class="btn" id="newCancel">取消</button>
+      <button class="btn primary" id="newOk">创建</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="usageModal">
+  <div class="modal">
+    <h3>📊 Token 用量（Claude）</h3>
+    <div id="usageBody"><div class="hint">加载中…</div></div>
+    <div class="actions"><button class="btn" id="usageClose">关闭</button></div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="permModal">
+  <div class="modal">
+    <h3>🔐 权限模式（Claude Code）</h3>
+    <div class="hint">写入本机 Claude Code 配置，新会话生效。</div>
+    <div class="row">
+      <button class="btn" data-mode="ask">🙋 请求批准</button>
+      <button class="btn" data-mode="auto">🤝 帮我批准</button>
+      <button class="btn" data-mode="full">⚡ 完全全自动</button>
+    </div>
+    <div class="hint" id="permStatus"></div>
+    <div class="actions"><button class="btn" id="permClose">关闭</button></div>
+  </div>
+</div>
+
+<script>
+const $ = id => document.getElementById(id);
+let sessions = [];
+let activeId = null;
+let es = null;
+let streaming = false;
+
+function esc(s) { return String(s == null ? '' : s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+function fmt(n) { return n >= 1e6 ? (n/1e6).toFixed(2) + 'M' : n >= 1e3 ? (n/1e3).toFixed(1) + 'k' : String(n); }
+
+async function api(url, opts) {
+  const r = await fetch(url, opts);
+  return r.json().catch(() => ({}));
+}
+
+async function refreshSessions() {
+  const d = await api('/claude/sessions');
+  sessions = d.sessions || [];
+  renderSessions();
+}
+
+function renderSessions() {
+  const el = $('sessionList');
+  el.innerHTML = sessions.length ? sessions.map(s =>
+    '<div class="sess-item' + (s.id === activeId ? ' active' : '') + '" data-id="' + esc(s.id) + '">' +
+      '<span class="name" title="' + esc(s.project) + '">' + esc(s.title) + '</span>' +
+      '<span class="meta">' + s.messages + ' 条' + (s.alive ? '' : ' · 已结束') + '</span>' +
+      '<span class="stop" data-stop="' + esc(s.id) + '" title="停止">✕</span>' +
+    '</div>'
+  ).join('') : '<div class="hint" style="padding:8px 10px">暂无对话，点上方“＋ 新建对话”</div>';
+}
+
+async function createSession(project) {
+  const d = await api('/claude/sessions', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ project: project }) });
+  if (d.id) { await refreshSessions(); openSession(d.id); }
+}
+
+function openSession(id) {
+  if (es) { es.close(); es = null; }
+  activeId = id;
+  const s = sessions.find(x => x.id === id);
+  $('chatTitle').textContent = s ? (s.title + ' · ' + s.project) : '';
+  $('chatHint').textContent = '';
+  $('messages').innerHTML = '<div class="empty">正在连接对话…</div>';
+  $('input').disabled = false; $('btnSend').disabled = false;
+  renderSessions();
+  es = new EventSource('/claude/sessions/' + id + '/events');
+  es.onmessage = ev => { try { handleEvent(JSON.parse(ev.data)); } catch (e) {} };
+  es.onerror = () => { $('chatHint').textContent = '连接中断，正在重试…'; };
+}
+
+let streamMsg = null;
+function handleEvent(ev) {
+  const box = $('messages');
+  if (ev.type === 'message') {
+    appendMsg(ev.message.role, ev.message.text);
+    return;
+  }
+  if (ev.type === 'system') {
+    if (ev.subtype === 'connected') {
+      box.innerHTML = '';
+      $('statusDot').classList.toggle('on', !!ev.alive);
+      if (!ev.alive) { $('chatHint').textContent = '会话已结束'; $('input').disabled = true; $('btnSend').disabled = true; }
+    } else if (ev.subtype === 'exit') {
+      $('statusDot').classList.remove('on');
+      $('chatHint').textContent = '会话已结束（退出码 ' + ev.code + '）';
+      $('input').disabled = true; $('btnSend').disabled = true;
+      if (streamMsg) { streamMsg = null; streaming = false; }
+      refreshSessions();
+    } else if (ev.subtype === 'error') {
+      appendMsg('error', '错误：' + (ev.error || '未知'));
+    }
+    return;
+  }
+  if (ev.type === 'user') {
+    appendMsg('user', ev.text);
+    return;
+  }
+  if (ev.type === 'assistant') {
+    const content = (ev.message && ev.message.content) || [];
+    const think = content.filter(c => c && c.type === 'thinking').map(c => c.thinking || '').join('');
+    const texts = content.filter(c => c && c.type === 'text').map(c => c.text || '').join('');
+    if (!streamMsg) {
+      streamMsg = document.createElement('div');
+      streamMsg.className = 'msg assistant';
+      streamMsg.innerHTML = '<div class="think">思考中…</div><span></span>';
+      box.appendChild(streamMsg);
+      streaming = true;
+    }
+    if (think) streamMsg.querySelector('.think').textContent = think.slice(0, 200) + (think.length > 200 ? '…' : '');
+    if (texts) streamMsg.querySelector('span').textContent = texts;
+    box.scrollTop = box.scrollHeight;
+    return;
+  }
+  if (ev.type === 'result') {
+    if (streamMsg) {
+      const txt = typeof ev.result === 'string' ? ev.result : (streamMsg.querySelector('span').textContent || '');
+      streamMsg.querySelector('span').textContent = txt;
+      streamMsg = null;
+    }
+    streaming = false;
+    box.scrollTop = box.scrollHeight;
+    refreshSessions();
+  }
+}
+
+function appendMsg(role, text) {
+  if (!text) return;
+  const box = $('messages');
+  if (box.querySelector('.empty')) box.innerHTML = '';
+  const d = document.createElement('div');
+  d.className = 'msg ' + (role === 'user' ? 'user' : (role === 'error' ? 'error' : 'assistant'));
+  d.textContent = text;
+  box.appendChild(d);
+  box.scrollTop = box.scrollHeight;
+}
+
+async function sendMessage() {
+  const inp = $('input');
+  const text = inp.value.trim();
+  if (!text || !activeId || streaming) return;
+  inp.value = '';
+  appendMsg('user', text);
+  await api('/claude/sessions/' + activeId + '/messages', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ text: text }) });
+}
+
+async function loadUsage() {
+  const d = await api('/usage');
+  const t = d.today || {};
+  const cny = v => '¥' + (v * (d.usd2cny || 7.2)).toFixed(2);
+  const usd = v => '$' + Number(v || 0).toFixed(4);
+  $('usageBody').innerHTML =
+    '<div class="hint">' + (d.ok ? '' : '用量库读取失败：' + esc(d.error || '') + '（CC Switch 未记录或未启动）') + '</div>' +
+    (d.provider ? '<div class="hint">当前供应商：<b style="color:var(--text)">' + esc(d.provider) + '</b></div>' : '') +
+    (d.models && d.models.length ? '<div class="hint">今日模型：' + d.models.map(m => esc(m.model) + '（' + m.n + ' 次）').join('、') + '</div>' : '') +
+    '<div class="stat-grid">' +
+      '<div class="stat"><span>今日请求</span><b>' + t.requests + '</b></div>' +
+      '<div class="stat"><span>输入 tokens</span><b>' + fmt(t.inputTokens) + '</b></div>' +
+      '<div class="stat"><span>输出 tokens</span><b>' + fmt(t.outputTokens) + '</b></div>' +
+      '<div class="stat"><span>缓存读</span><b>' + fmt(t.cacheReadTokens) + '</b></div>' +
+      '<div class="stat"><span>缓存写</span><b>' + fmt(t.cacheWriteTokens) + '</b></div>' +
+      '<div class="stat"><span>今日费用</span><b>' + usd(t.costUsd) + ' / ' + cny(t.costUsd) + '</b></div>' +
+    '</div>' +
+    (d.days && d.days.length ? '<table><tr><th>日期</th><th>请求</th><th>输入</th><th>输出</th><th>费用</th></tr>' +
+      d.days.map(x => '<tr><td>' + esc(x.date) + '</td><td>' + x.requests + '</td><td>' + fmt(x.inputTokens) + '</td><td>' + fmt(x.outputTokens) + '</td><td>' + usd(x.costUsd) + '</td></tr>').join('') + '</table>'
+      : '<div class="hint">暂无历史用量数据</div>');
+}
+
+async function loadPerm() {
+  const d = await api('/permissions');
+  const mode = d.mode || 'ask';
+  document.querySelectorAll('#permModal [data-mode]').forEach(b => b.classList.toggle('active', b.dataset.mode === mode));
+  const names = { ask: '请求批准（每次询问）', auto: '帮我批准（自动同意文件编辑）', full: '完全全自动（不询问）' };
+  $('permStatus').textContent = '当前模式：' + (names[mode] || mode);
+}
+
+$('btnNew').addEventListener('click', () => { $('newModal').classList.add('open'); $('projectSel').focus(); });
+$('newCancel').addEventListener('click', () => $('newModal').classList.remove('open'));
+$('newOk').addEventListener('click', async () => {
+  const sel = $('projectSel').value;
+  const project = sel === '__custom__' ? $('customPath').value.trim() : sel;
+  if (!project) { alert('请选择或填写项目路径'); return; }
+  $('newModal').classList.remove('open');
+  await createSession(project);
+});
+$('projectSel').addEventListener('change', e => { $('customRow').style.display = e.target.value === '__custom__' ? 'flex' : 'none'; });
+$('sessionList').addEventListener('click', e => {
+  const stop = e.target.closest('[data-stop]');
+  if (stop) { api('/claude/sessions/' + stop.dataset.stop + '/stop', { method: 'POST' }); return; }
+  const it = e.target.closest('[data-id]');
+  if (it) openSession(it.dataset.id);
+});
+$('btnSend').addEventListener('click', sendMessage);
+$('input').addEventListener('keydown', e => {
+  if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendMessage(); }
+});
+$('btnUsage').addEventListener('click', async () => { $('usageModal').classList.add('open'); await loadUsage(); });
+$('usageClose').addEventListener('click', () => $('usageModal').classList.remove('open'));
+$('btnPerm').addEventListener('click', async () => { $('permModal').classList.add('open'); await loadPerm(); });
+$('permClose').addEventListener('click', () => $('permModal').classList.remove('open'));
+document.querySelectorAll('#permModal [data-mode]').forEach(b => b.addEventListener('click', async () => {
+  const d = await api('/permissions', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ mode: b.dataset.mode }) });
+  $('permStatus').textContent = d.ok ? '已保存，新会话生效' : '保存失败';
+  await loadPerm();
+}));
+
+refreshSessions();
+</script>
+</body>
+</html>

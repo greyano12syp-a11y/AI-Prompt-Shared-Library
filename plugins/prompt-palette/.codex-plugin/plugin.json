@@ -1,0 +1,31 @@
+{
+  "name": "prompt-palette",
+  "version": "0.1.0+codex.20260808081316",
+  "description": "\u4e2d\u6587\uff1aAI \u63d0\u793a\u8bcd\u5171\u4eab\u5e93\uff1a\u6536\u85cf\u3001\u5206\u7c7b\u3001\u8c03\u7528\u5e38\u7528\u63d0\u793a\u8bcd",
+  "author": {
+    "name": "Local developer"
+  },
+  "keywords": [
+    "prompt",
+    "\u63d0\u793a\u8bcd",
+    "\u63d0\u793a\u8bcd\u5e93",
+    "AI",
+    "workflow",
+    "gist",
+    "\u4e91\u540c\u6b65"
+  ],
+  "skills": "./skills/",
+  "interface": {
+    "displayName": "AI \u63d0\u793a\u8bcd\u5171\u4eab\u5e93",
+    "shortDescription": "\u4e2d\u6587\uff1aAI \u63d0\u793a\u8bcd\u5171\u4eab\u5e93\uff1a\u6536\u85cf\u3001\u5206\u7c7b\u3001\u8c03\u7528\u5e38\u7528\u63d0\u793a\u8bcd",
+    "longDescription": "AI Prompt Shared Library: collect, organize, share and reuse frequently used prompts.\n\n\u3010\u4e2d\u6587\u8bf4\u660e\u3011\nAI \u63d0\u793a\u8bcd\u5171\u4eab\u5e93\uff1a\u7ba1\u7406\u5e38\u7528\u63d0\u793a\u8bcd\uff0c\u652f\u6301\u6536\u85cf\u3001\u5206\u7c7b\u3001\u793e\u533a\u5171\u4eab\u548c\u5feb\u901f\u8c03\u7528\u3002",
+    "developerName": "Local developer",
+    "category": "Productivity",
+    "capabilities": [
+      "Interactive"
+    ],
+    "defaultPrompt": [
+      "\u6253\u5f00AI \u63d0\u793a\u8bcd\u5171\u4eab\u5e93"
+    ]
+  }
+}

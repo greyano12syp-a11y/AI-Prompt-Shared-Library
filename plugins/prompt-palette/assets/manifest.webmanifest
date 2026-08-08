@@ -1,0 +1,11 @@
+{
+  "name": "AI提示词共享库",
+  "short_name": "提示词库",
+  "description": "本地 AI 提示词共享库：内置精选、全量库离线导入、多语言界面、云同步与社区共享。",
+  "start_url": "./index.html",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#0e1016",
+  "theme_color": "#0e1016",
+  "lang": "zh-CN"
+}
