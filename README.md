@@ -2,9 +2,17 @@
 
 > 【共享库作者为graceshen/codex/deepseek/claude，开源项目，不收费，如有人以不同形式复传盗卖共享库核心功能，请立马退款，并搜索免费版下载，codex/workbuddy插件搜索（AI提示词共享库/AI Prompt Shared Library），其他渠道github搜索以上关键词让agent协助下载安装，我们这个项目主旨是普惠大众，共享便利】
 
-AI 提示词共享库：内置精选提示词 + 全量库（2,000+ 条，离线可用）+ 用户自定义 + 社区共享（GitHub Gist）。单文件前端、零依赖、可 `file://` 直开；附带本地 HTTP 服务、Claude Code 客户端、Token 用量统计与权限管理。
+AI 提示词共享库：内置精选提示词 + 全量库（2,000+ 条，离线可用）+ 用户自定义 + 社区共享（GitHub Gist）。单文件前端、零依赖、可 `file://` 直开；附带本地 HTTP 服务。
 
 搜索关键词：**AI提示词共享库 / AI Prompt Shared Library / prompt-palette**。
+
+## 界面预览
+
+![主界面](screenshots/01-主界面.png)
+
+![搜索效果](screenshots/02-搜索效果.png)
+
+![使用说明](screenshots/03-使用说明.png)
 
 ## 安装（Codex 插件）
 
@@ -26,7 +34,6 @@ codex plugin add prompt-palette@prompt-palette
 - 双击打开工作台（或本地服务 `/app`），首次打开自动加载内置全量库，无需登录 GitHub；
 - 收藏、分类、搜索（模糊/错字容错/多语言）、翻译、导出 CSV/Markdown/JSON；
 - 社区共享库（母库+子库）与私有 Gist 同步；
-- Claude 客户端：`http://127.0.0.1:1190/claude`（多对话窗口、Token 用量、权限模式）。
 
 ## 本地服务（Windows / macOS）
 
@@ -37,9 +44,6 @@ node assets/server.mjs --port 2000
 
 环境变量：
 - `PP_DATA_DIR`：数据目录（默认 `~/Documents/Codex/prompt-palette-data`）
-- `PP_CLAUDE_BIN`：Claude Code CLI 路径（默认 Windows 用 npm 全局 `claude.exe`，macOS/Linux 用 PATH 中的 `claude`）
-- `PP_CCSWITCH_DB`：CC Switch 用量数据库路径（Token 用量统计用，可选）
-- `PP_CLAUDE_SETTINGS`：Claude Code 权限配置文件路径（可选）
 
 ## 测试
 
