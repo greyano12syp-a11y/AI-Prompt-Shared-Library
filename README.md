@@ -18,7 +18,7 @@ AI 提示词共享库：内置精选提示词 + 全量库（2,000+ 条，离线�
 
 ```bash
 # 添加公开市场（只需一次）
-codex plugin marketplace add https://github.com/graceshen/AI-Prompt-Shared-Library
+codex plugin marketplace add https://github.com/greyano12syp-a11y/AI-Prompt-Shared-Library
 # 安装插件
 codex plugin add prompt-palette@prompt-palette
 ```
