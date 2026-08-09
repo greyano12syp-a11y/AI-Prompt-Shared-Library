@@ -837,18 +837,6 @@
         </div>
       </div>
     </div>
-    <label data-i18n="io.permsLabel">🔐 Agent 权限模式（Claude Code）</label>
-    <div class="row">
-      <div class="import-zone" style="flex:1">
-        <div class="hint" data-i18n="io.permsHint">选择后立即写入本机 Claude Code 配置，新会话生效：请求批准 = 每次都问；帮我批准 = 自动同意文件编辑；完全全自动 = 不再询问。</div>
-        <div id="permModes" style="display:flex;gap:8px;flex-wrap:wrap;margin-top:8px">
-          <button class="btn" data-mode="ask" data-i18n="io.permAsk">🙋 请求批准</button>
-          <button class="btn" data-mode="auto" data-i18n="io.permAuto">🤝 帮我批准</button>
-          <button class="btn" data-mode="full" data-i18n="io.permFull">⚡ 完全全自动</button>
-        </div>
-        <div class="hint" id="permStatus" style="margin-top:8px"></div>
-      </div>
-    </div>
     <div class="actions">
       <button class="btn" id="ioClose" data-i18n="common.close">关闭</button>
     </div>
@@ -1089,22 +1077,7 @@
     </div>
     <div class="actions">
       <label style="display:flex;gap:6px;align-items:center;margin-right:auto;font-size:12.5px;color:var(--muted)"><input type="checkbox" id="helpNoMore"> <span data-i18n="help.noMore">不再自动弹出使用说明</span></label>
-      <button class="btn" id="btnApprovalDemo" data-i18n="approval.demo">🛡 审批按钮演示</button>
       <button class="btn" id="helpClose" data-i18n="help.close">知道了</button>
-    </div>
-  </div>
-</div>
-
-<!-- Codex 风格审批卡片 -->
-<div class="modal-overlay" id="approvalModal">
-  <div class="modal" style="max-width:520px">
-    <h3 id="approvalTitle" data-i18n="approval.title">🛡 需要你的批准</h3>
-    <div id="approvalDetail" class="hint" style="margin-top:8px;white-space:pre-line;max-height:260px;overflow-y:auto;line-height:1.7"></div>
-    <div class="actions" style="margin-top:18px">
-      <button class="btn" id="approvalDeny" data-i18n="approval.deny">拒绝</button>
-      <span style="flex:1"></span>
-      <button class="btn" id="approvalAlways" data-i18n="approval.always" style="display:none">始终允许</button>
-      <button class="btn primary" id="approvalAllow" data-i18n="approval.allow">允许</button>
     </div>
   </div>
 </div>
@@ -1522,24 +1495,14 @@ const I18N_EXTRA = {
     'hot.noContrib': '暂无贡献者数据（收藏并同步共享库后这里会出现榜单）',
     'hot.nickBar': '榜单上显示“我”？填个昵称上榜更帅：','user.follow': '+ 关注','user.unfollow': '✓ 已关注（点击取关）','user.remark': '备注昵称','user.favAll': '⭐ 一键收藏全部到我的','user.noPrompts': '该用户还没有上传共享提示词','user.remarkPh': '给 TA 备注一个名字（TA 改名也不怕）','user.followOnly': '只看我关注的','user.followed': '已关注','user.followEmpty': '还没有关注的人（点名字进 TA 的库后可关注）',
     'io.nickHint': '我的昵称（显示在贡献者榜，可写 GitHub 名，需通过合规检测）：',
-    'io.nickPh': '例如：Moss','io.libMaster': '当前：母库','io.libSub': '当前：我的子库','io.nickConfirm': '我已确认改名（每周限改一次，保存后生效）','io.findSub': '🔍 找回我的子库链接','io.masterOwner': '本机是母库创建者（贡献者榜合并母库主人身份）','io.masterOwnerHint': '登录并验证 GitHub 账号后，仅母库创建者会看到此开关；换电脑时登录同一账号验证后重新勾选一次即可。取消勾选会同时清除共享状态里的标记。','user.resizeHint': '拖动底部横条或右下角可拉长窗口','approval.title': '🛡 需要你的批准','approval.allow': '允许','approval.deny': '拒绝','approval.always': '始终允许','approval.demo': '🛡 审批按钮演示','io.permsLabel': '🔐 Agent 权限模式（Claude Code）','io.permsHint': '选择后立即写入本机 Claude Code 配置，新会话生效：请求批准 = 每次都问；帮我批准 = 自动同意文件编辑；完全全自动 = 不再询问。','io.permAsk': '🙋 请求批准','io.permAuto': '🤝 帮我批准','io.permFull': '⚡ 完全全自动'
+    'io.nickPh': '例如：Moss','io.libMaster': '当前：母库','io.libSub': '当前：我的子库','io.nickConfirm': '我已确认改名（每周限改一次，保存后生效）','io.findSub': '🔍 找回我的子库链接','io.masterOwner': '本机是母库创建者（贡献者榜合并母库主人身份）','io.masterOwnerHint': '登录并验证 GitHub 账号后，仅母库创建者会看到此开关；换电脑时登录同一账号验证后重新勾选一次即可。取消勾选会同时清除共享状态里的标记。','user.resizeHint': '拖动底部横条或右下角可拉长窗口'
   },
   'zh-TW': {
     'io.localLib': '📦 內建完整資料庫（離線匯入）',
     'io.localLibHint': '無需連網：從插件/網站自帶的完整資料庫匯入（約 2450 條）。單檔版請用「選擇檔案匯入」選同目錄的 prompts.csv。',
     'io.masterOwner': '本機是母庫建立者（貢獻者榜合併母庫主人身份）',
     'io.masterOwnerHint': '登入並驗證 GitHub 帳號後，僅母庫建立者會看到此開關；換電腦時登入同一帳號驗證後重新勾選一次即可。取消勾選會同時清除共享狀態裡的標記。',
-    'user.resizeHint': '拖動底部橫條或右下角可拉長視窗',
-    'approval.title': '🛡 需要你的批准',
-    'approval.allow': '允許',
-    'approval.deny': '拒絕',
-    'approval.always': '始終允許',
-    'approval.demo': '🛡 審批按鈕演示',
-    'io.permsLabel': '🔐 Agent 權限模式（Claude Code）',
-    'io.permsHint': '選擇後立即寫入本機 Claude Code 設定，新會話生效：請求批准 = 每次都問；幫我批准 = 自動同意檔案編輯；完全全自動 = 不再詢問。',
-    'io.permAsk': '🙋 請求批准',
-    'io.permAuto': '🤝 幫我批准',
-    'io.permFull': '⚡ 完全全自動'
+    'user.resizeHint': '拖動底部橫條或右下角可拉長視窗'
   },
   'en': {
     'io.localLib': '📦 Built-in Full Library (Offline Import)',
@@ -1547,16 +1510,6 @@ const I18N_EXTRA = {
     'io.masterOwner': 'This machine is the master library creator (leaderboard merges the master owner identity)',
     'io.masterOwnerHint': 'After verifying your GitHub login, only the master library creator sees this switch. On a new machine, verify with the same account and check it once; unchecking also clears the mark from the shared state.',
     'user.resizeHint': 'Drag the bottom bar or bottom-right corner to resize the window',
-    'approval.title': '🛡 Approval Required',
-    'approval.allow': 'Allow',
-    'approval.deny': 'Deny',
-    'approval.always': 'Always Allow',
-    'approval.demo': '🛡 Approval Button Demo',
-    'io.permsLabel': '🔐 Agent Permission Mode (Claude Code)',
-    'io.permsHint': 'Applies to the local Claude Code config immediately; takes effect in new sessions. Ask = prompt every time; Help Me Approve = auto-accept file edits; Fully Automatic = no prompts.',
-    'io.permAsk': '🙋 Ask First',
-    'io.permAuto': '🤝 Help Me Approve',
-    'io.permFull': '⚡ Fully Automatic',
     'diag.run': '🔧 Diagnose Translation Channels',
     'diag.checking': 'Checking translation channels…',
     'diag.ok': 'OK ✓',
@@ -2634,14 +2587,12 @@ function openHist() {
 function deleteCustom(id) {
   const item = customs.find(x => x.id === id);
   if (!item) return;
-    askApproval({ title: t('approval.title'), detail: '确定删除提示词「' + item.t + '」吗？删除后不可恢复。' }).then(r => {
-      if (r !== 'allow' && r !== 'always') return;
-      customs = customs.filter(x => x.id !== id);
-      favs.delete(id);
-      persistAll();
-      render();
-      toast('已删除');
-    });
+  if (!confirm('确定删除提示词「' + item.t + '」吗？')) return;
+  customs = customs.filter(x => x.id !== id);
+  favs.delete(id);
+  persistAll();
+  render();
+  toast('已删除');
 }
 
 /* ============ CSV 解析与导入 ============ */
@@ -4884,14 +4835,15 @@ $('myNickSave').addEventListener('click', () => {
 const masterOwnerChk = $('masterOwnerChk');
 if (masterOwnerChk) {
   masterOwnerChk.checked = !!isMasterOwner;
-  masterOwnerChk.addEventListener('change', async () => {
+  masterOwnerChk.addEventListener('change', () => {
     const on = masterOwnerChk.checked;
-    if (on) {
-      const r = await askApproval({ title: t('approval.title'), detail: '确认将本机标记为母库创建者？贡献者榜会把母库拥有者的贡献合并到“我”的身份。' });
-      if (r !== 'allow' && r !== 'always') { masterOwnerChk.checked = false; return; }
-    } else if (isMasterOwner) {
-      const r = await askApproval({ title: t('approval.title'), detail: '确认取消母库创建者标记？共享状态中的标记也会一并清除。' });
-      if (r !== 'allow' && r !== 'always') { masterOwnerChk.checked = true; return; }
+    if (on && !confirm('确认将本机标记为母库创建者？贡献者榜会把母库拥有者的贡献合并到“我”的身份。')) {
+      masterOwnerChk.checked = false;
+      return;
+    }
+    if (!on && isMasterOwner && !confirm('确认取消母库创建者标记？共享状态中的标记也会一并清除。')) {
+      masterOwnerChk.checked = true;
+      return;
     }
     isMasterOwner = on;
     save('apw_master_owner_v1', on);
