@@ -6,6 +6,10 @@ AI 提示词共享库：内置精选提示词 + 全量库（2,000+ 条，离线�
 
 搜索关键词：**AI提示词共享库 / AI Prompt Shared Library / prompt-palette**。
 
+## 更新记录
+
+2026-10-09：新增“视频”分类 26 条提示词、三个官方指南精选入口及 GitHub 全量库定时联网更新。详见[完整更新记录](CHANGELOG.md)。
+
 ## 界面预览
 
 ![主界面](screenshots/01-主界面.png)
