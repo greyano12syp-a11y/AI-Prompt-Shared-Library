@@ -39,13 +39,14 @@
   }
   * { box-sizing: border-box; margin: 0; padding: 0; }
   :focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
-  html, body { height: 100%; }
+  html { height: 100%; }
   html { scroll-behavior: smooth; }
   @media (prefers-reduced-motion: reduce) {
     html { scroll-behavior: auto; }
     * { transition-duration: .01ms !important; animation-duration: .01ms !important; }
   }
   body {
+    min-height: 100%;
     font-family: "Segoe UI", "PingFang SC", "Hiragino Sans GB", "HarmonyOS Sans SC", "MiSans", "Microsoft YaHei UI", "Microsoft YaHei", "Noto Sans SC", sans-serif;
     background: var(--bg);
     color: var(--text);
@@ -105,7 +106,11 @@
   .nav-item.active { background: rgba(91,140,255,0.15); color: var(--accent2); font-weight: 600; }
   .nav-item .count { font-size: 12px; color: var(--muted); }
   section { flex: 1; padding: 18px 22px 40px; min-width: 0; }
+  .view-tabs { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 12px; }
+  .view-tabs .nav-item { gap: 8px; margin: 0; }
   .toolbar { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; margin-bottom: 12px; }
+  .sort-control { display: flex; align-items: center; gap: 6px; font-size: 14px; color: var(--muted); }
+  #addedSort { background: var(--panel2); color: var(--text); border: 1px solid var(--border); border-radius: 8px; padding: 7px 9px; font: inherit; }
   .search-wrap { position: relative; flex: 1; min-width: 260px; max-width: 620px; }
   .search-wrap input {
     width: 100%; padding: 10px 14px 10px 36px;
@@ -571,15 +576,6 @@
 
 <main>
   <aside>
-    <h2 data-i18n="nav.view">视图</h2>
-    <div class="nav-wrap">
-      <div class="nav-item active" data-cat="all"><span data-i18n="nav.all">全部</span><span class="count" id="cntAll"></span></div>
-      <div class="nav-item" data-cat="fav"><span data-i18n="nav.fav">★ 收藏</span><span class="count" id="cntFav"></span></div>
-      <div class="nav-item" data-cat="my"><span data-i18n="nav.my">我的提示词</span><span class="count" id="cntMy"></span></div>
-      <div class="nav-item" data-cat="hot"><span data-i18n="nav.hot">🔥 收藏热榜</span><span class="count" id="cntHot"></span></div>
-      <div class="nav-item" data-cat="com"><span data-i18n="nav.com">🌐 社区库</span><span class="count" id="cntCom"></span></div>
-      <div class="nav-item" data-cat="gh"><span data-i18n="nav.gh">GitHub 全量库</span><span class="count" id="cntGh"></span></div>
-    </div>
     <h2>官方指南精选</h2>
     <div class="nav-wrap">
       <div class="nav-item" data-cat="official-openai"><span>OpenAI 官方</span><span class="count" id="cntOfficialOpenai">0</span></div>
@@ -604,6 +600,17 @@
   </aside>
 
   <section>
+    <nav class="view-tabs" id="viewTabs" aria-label="视图">
+      <div class="nav-item active" data-cat="all"><span data-i18n="nav.all">全部</span><span class="count" id="cntAll"></span></div>
+      <div class="nav-item" data-cat="fav"><span data-i18n="nav.fav">★ 收藏</span><span class="count" id="cntFav"></span></div>
+      <div class="nav-item" data-cat="my"><span data-i18n="nav.my">我的提示词</span><span class="count" id="cntMy"></span></div>
+      <div class="nav-item" data-cat="hot"><span data-i18n="nav.hot">🔥 收藏热榜</span><span class="count" id="cntHot"></span></div>
+      <div class="nav-item" data-cat="com"><span data-i18n="nav.com">🌐 社区库</span><span class="count" id="cntCom"></span></div>
+      <div class="nav-item" data-cat="gh"><span data-i18n="nav.gh">GitHub 全量库</span><span class="count" id="cntGh"></span></div>
+      <div class="nav-item" data-cat="official-openai"><span>OpenAI 官方精选</span><span class="count" id="cntTopOfficialOpenai">0</span></div>
+      <div class="nav-item" data-cat="official-claude"><span>Claude 官方精选</span><span class="count" id="cntTopOfficialClaude">0</span></div>
+      <div class="nav-item" data-cat="official-gemini"><span>Gemini 官方精选</span><span class="count" id="cntTopOfficialGemini">0</span></div>
+    </nav>
     <div class="toolbar">
       <div class="search-wrap">
         <span class="search-icon">⌕</span>
@@ -611,6 +618,12 @@
         <span id="searchClear" class="search-clear" title="清除搜索" data-i18n-title="search.clearTitle">✕</span>
         <span class="kbd">/</span>
       </div>
+      <label class="sort-control" title="优先按已有添加或上传时间排序；缺少时间的旧条目按原始保存顺序排列。刷新和编辑不会重置添加顺序。">添加顺序
+        <select id="addedSort" aria-label="添加顺序">
+          <option value="newest">最新在前 ↓</option>
+          <option value="oldest">最早在前 ↑</option>
+        </select>
+      </label>
       <div class="chips" id="chips"></div>
       <div id="catFilterTag" style="display:none;align-items:center;gap:6px;background:var(--panel2);border:1px solid var(--border);border-radius:999px;padding:3px 10px;font-size:12.5px;color:var(--text)"><span data-i18n="catfilter.current">当前分类：</span><b id="catFilterName"></b><span id="catFilterClear" style="cursor:pointer;color:var(--muted)" title="清除分类筛选" data-i18n-title="catfilter.clearTitle">✕</span></div>
     </div>
@@ -1367,6 +1380,7 @@ let favs = new Set(load('apw_favs_v1', []));
 let imported = [];
 let officialGuideItems = [];
 let currentView = 'all';
+let addedSort = load('apw_added_sort_v1', 'newest') === 'oldest' ? 'oldest' : 'newest';
 let catFilter = '';
 let pageSize = load('apw_page_size_v1', 100);
 let gridPage = 0;
@@ -2109,6 +2123,35 @@ function allItems() {
   community.prompts.forEach(p => list.push(Object.assign({ source: '社区' }, p, { source: '社区' })));
   return list;
 }
+function promptAddedTime(item) {
+  const value = item.source === '社区'
+    ? (item.uploadedAt || item.addedAt || item.createdAt)
+    : (item.addedAt || item.createdAt || item.uploadedAt);
+  const time = typeof value === 'number' ? value : Date.parse(value || '');
+  if (Number.isFinite(time) && time > 0) return time;
+  // 旧版自定义 ID 中保存了真实创建时间；不把编辑时间当成添加时间。
+  const match = /^c-(?:video(?:-md|-restore)?-)?(\d{13})(?:-|$)/.exec(String(item.id || ''));
+  return match ? Number(match[1]) : 0;
+}
+function sortByAddition(list) {
+  const savedOrder = new Map();
+  let index = 0;
+  const record = (items, source) => items.forEach(item => savedOrder.set(source + ':' + item.id, index++));
+  record(BUILTINS, '内置');
+  record(customs.slice().reverse(), '我的'); // 自定义库原本按新到旧保存。
+  record(imported, 'GitHub');
+  record(officialGuideItems, 'GitHub');
+  record(community.prompts, '社区');
+  const direction = addedSort === 'oldest' ? 1 : -1;
+  return list.sort((a, b) => {
+    const timeDiff = promptAddedTime(a) - promptAddedTime(b);
+    if (timeDiff) return direction * timeDiff;
+    const batchA = /^(c-video(?:-md)?-\d{13})-(\d+)$/.exec(String(a.id || ''));
+    const batchB = /^(c-video(?:-md)?-\d{13})-(\d+)$/.exec(String(b.id || ''));
+    if (a.source === b.source && batchA && batchB && batchA[1] === batchB[1]) return direction * (Number(batchA[2]) - Number(batchB[2]));
+    return direction * ((savedOrder.get(a.source + ':' + a.id) || 0) - (savedOrder.get(b.source + ':' + b.id) || 0));
+  });
+}
 /**
  * 跨来源去重：按正文（去空白后）或其前 160 字符指纹判重，
  * 保留来源优先级最高的条目（我的 > 内置 > 社区 > GitHub）。
@@ -2292,11 +2335,9 @@ function getVisible() {
         });
       }
     }
-    scored.sort((a, b) => b.s - a.s);
     list = scored.map(v => v.x);
   }
-  if (currentView === 'fav') list.sort((a, b) => (favs.has(a.id) === favs.has(b.id)) ? 0 : (favs.has(a.id) ? -1 : 1));
-  return list;
+  return sortByAddition(list);
 }
 
 function render() {
@@ -2311,6 +2352,9 @@ function render() {
   $('cntOfficialOpenai').textContent = officialGuideItems.filter(x => x.officialProvider === 'openai').length;
   $('cntOfficialClaude').textContent = officialGuideItems.filter(x => x.officialProvider === 'claude').length;
   $('cntOfficialGemini').textContent = officialGuideItems.filter(x => x.officialProvider === 'gemini').length;
+  $('cntTopOfficialOpenai').textContent = $('cntOfficialOpenai').textContent;
+  $('cntTopOfficialClaude').textContent = $('cntOfficialClaude').textContent;
+  $('cntTopOfficialGemini').textContent = $('cntOfficialGemini').textContent;
   const hotIds = new Set();
   favEvents.forEach(e => hotIds.add(e.id));
   (community.favorites || []).forEach(e => hotIds.add(e.id));
@@ -2573,7 +2617,8 @@ function saveEditor() {
       customs[idx].t = t; customs[idx].p = p; customs[idx].c = c; customs[idx].tags = tags;
     }
   } else {
-    customs.unshift({ id: 'c-' + Date.now(), c, t, tags, p });
+    const addedAt = Date.now();
+    customs.unshift({ id: 'c-' + addedAt, addedAt, c, t, tags, p });
   }
   persistAll();
   closeEditor(true);
@@ -2757,13 +2802,16 @@ function importCsvText(text, label, options) {
   let headerIdx = 0;
   if (rows.length && rows[0] && String(rows[0][0]).toLowerCase() === 'act') headerIdx = 1;
   const items = [];
+  const previous = new Map(imported.map(item => [item.t, item]));
+  const addedAt = Date.now();
   for (let i = headerIdx; i < rows.length; i++) {
     const r = rows[i];
     const t = r[0] ? String(r[0]).trim() : '';
     const p = r[1] ? String(r[1]).trim() : '';
     if (t && p) {
       const zhInfo = promptZh(t);
-      items.push({ id: 'g-' + i, c: guessCat(t, p), t, zh: zhInfo ? zhInfo.zh : '', d: zhInfo ? zhInfo.d : '', tags: ['GitHub'], p });
+      const existing = previous.get(t);
+      items.push({ id: 'g-' + i, addedAt: existing ? existing.addedAt : addedAt, c: guessCat(t, p), t, zh: zhInfo ? zhInfo.zh : '', d: zhInfo ? zhInfo.d : '', tags: ['GitHub'], p });
     }
   }
   imported = items;
@@ -2817,8 +2865,11 @@ const OFFICIAL_GUIDE_SETS = {
 async function importOfficialGuide(provider) {
   const set = OFFICIAL_GUIDE_SETS[provider];
   if (!set) return;
+  const previous = new Map(officialGuideItems.map(item => [item.id, item]));
+  const addedAt = Date.now();
   const freshItems = set.items.map(item => ({
     id: 'official-' + provider + '-' + item.id,
+    addedAt: previous.has('official-' + provider + '-' + item.id) ? previous.get('official-' + provider + '-' + item.id).addedAt : addedAt,
     c: item.c,
     t: item.t,
     zh: '',
@@ -2984,7 +3035,8 @@ function importJsonFile(file) {
     try {
       const data = JSON.parse(String(e.target.result));
       if (Array.isArray(data.customs)) {
-        customs = customs.concat(data.customs.map(c => Object.assign({ id: 'c-' + Date.now() + '-' + Math.random().toString(36).slice(2, 7) }, c)));
+        const addedAt = Date.now();
+        customs = customs.concat(data.customs.map(c => Object.assign({ id: 'c-' + addedAt + '-' + Math.random().toString(36).slice(2, 7), addedAt }, c)));
       }
       if (Array.isArray(data.favorites)) {
         data.favorites.forEach(f => favs.add(f));
@@ -3472,7 +3524,8 @@ async function uploadCommunity() {
           if (!body || body.length > 20000) { skipCount++; return; }
           if (bodySeen.has(body) || seenLocal.has(body)) { skipCount++; return; }
           seenLocal.add(body);
-          pMap.set(c.id, Object.assign({}, c, { uid: clientId, un: myNick, updatedAt: new Date().toISOString() }));
+          const uploadedAt = new Date().toISOString();
+          pMap.set(c.id, Object.assign({}, c, { uid: clientId, un: myNick, uploadedAt, updatedAt: uploadedAt }));
           addedCount++;
         });
         cloud.prompts = Array.from(pMap.values());
@@ -4471,6 +4524,7 @@ search.addEventListener('input', () => {
   searchTrans = '';
   gridPage = 0;
   render();
+  scrollToResultsTop();
   if (!q) return;
   if (!/[\u4e00-\u9fff]/.test(q) && !/[a-zA-Z]/.test(q)) return;
   searchTimer = setTimeout(async () => {
@@ -4490,6 +4544,7 @@ function applyCatFilter(key) {
     catFilter = key === 'all' ? '' : key;
     gridPage = 0;
     render();
+    scrollToResultsTop();
   }
 }
 $('chips').addEventListener('click', e => {
@@ -4499,7 +4554,7 @@ $('chips').addEventListener('click', e => {
   applyCatFilter(chip.dataset.cat);
 });
 
-document.querySelector('aside').addEventListener('click', e => {
+function handleNavClick(e) {
   const el = e.target.closest('.nav-item');
   if (!el) return;
   if (el.dataset.cat === 'dir') { openCatDir(); return; }
@@ -4513,8 +4568,17 @@ document.querySelector('aside').addEventListener('click', e => {
     if (el.dataset.cat === 'gh') refreshGithubCsvIfDue();
   } else {
     applyCatFilter(el.dataset.cat);
-    scrollToResultsTop();
   }
+}
+document.querySelector('aside').addEventListener('click', handleNavClick);
+$('viewTabs').addEventListener('click', handleNavClick);
+$('addedSort').value = addedSort;
+$('addedSort').addEventListener('change', e => {
+  addedSort = e.target.value === 'oldest' ? 'oldest' : 'newest';
+  save('apw_added_sort_v1', addedSort);
+  gridPage = 0;
+  render();
+  scrollToResultsTop();
 });
 
 $('catGrid').addEventListener('click', e => {
@@ -4522,14 +4586,13 @@ $('catGrid').addEventListener('click', e => {
   if (!it) return;
   applyCatFilter(it.dataset.cat);
   $('catModal').classList.remove('open');
-  scrollToResultsTop();
 });
 $('catPrev').addEventListener('click', () => { catPage--; renderCatDir(); });
 $('catNext').addEventListener('click', () => { catPage++; renderCatDir(); });
 $('catClose').addEventListener('click', () => $('catModal').classList.remove('open'));
 $('catFilterClear').addEventListener('click', () => applyCatFilter('all'));
 function scrollToResultsTop() {
-  const anchor = document.querySelector('.toolbar') || document.querySelector('section') || document.body;
+  const anchor = $('viewTabs');
   const header = document.querySelector('header');
   const hh = header ? header.getBoundingClientRect().height : 54;
   const y = Math.max(0, anchor.getBoundingClientRect().top + window.pageYOffset - hh - 12);
@@ -4564,6 +4627,7 @@ searchClear.addEventListener('click', () => {
   gridPage = 0;
   render();
   updateSearchClear();
+  scrollToResultsTop();
   search.focus();
 });
 $('hotChips').addEventListener('click', e => {
