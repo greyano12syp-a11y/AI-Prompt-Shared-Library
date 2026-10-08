@@ -51,7 +51,7 @@ prompt-palette/
 │   ├── AI提示词工作台.html    # 单文件工作台（主脚本内嵌，约 32 万字节）
 │   ├── server.mjs             # 本地 HTTP 服务（见下方「安全模型」）
 │   ├── search_prompt.mjs      # CLI 检索脚本（供 agent 调用）
-│   ├── prompts.json           # 内置提示词（82 条，{id,c,t,tags,p}）
+│   ├── prompts.json           # 内置提示词（108 条，含“视频”分类，{id,c,t,tags,p}）
 │   ├── prompts.csv            # 内置提示词 CSV（导出/兼容用）
 │   ├── libs/                  # 本地文档解析库（mammoth/xlsx/pdfjs，白名单）
 │   ├── sw.js                  # Service Worker（仅缓存静态资源，豁免 /data/）
